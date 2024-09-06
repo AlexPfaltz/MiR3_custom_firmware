@@ -57,18 +57,32 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-    - name: Load custom feeds
+        - name: Cache OpenWrt
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-openwrt
+      with:
+        path: |
+          openwrt/staging_dir
+          openwrt/build_dir
+          openwrt/dl
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ env.REPO_BRANCH }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+    
+    - name: Check cache
+      run: |
+        [ -d openwrt/staging_dir ] && echo "Found staging_dir cache" || echo "No staging_dir cache"
+        [ -d openwrt/build_dir ] && echo "Found build_dir cache" || echo "No build_dir cache"
+        [ -d openwrt/dl ] && echo "Found dl cache" ||  echo "No dl cache"
+        ls -al openwrt
+
+    - name: Setup feeds
       run: |
         [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-        chmod +x $DIY_P1_SH
         cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P1_SH
-
-    - name: Update feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
-    - name: Install feeds
-      run: cd openwrt && ./scripts/feeds install -a
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
 
     - name: Load custom configuration
       run: |
