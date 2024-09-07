@@ -84,11 +84,6 @@ jobs:
         ./scripts/feeds update -a
         ./scripts/feeds install -a
 
-    - name: Load custom files
-      run: |
-        [ -d $FILES_PATH ] && mv $FILES_PATH openwrt/files
-        cd openwrt && git status -s
-
     - name: Load custom config
       run: |
                 [ -e files ] && mv files openwrt/files
