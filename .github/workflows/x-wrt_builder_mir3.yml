@@ -53,13 +53,7 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL
         ln -sf /workdir/x-wrt $GITHUB_WORKSPACE/x-wrt
-
-    - name: Update code tag
-      run: |
-        cd x-wrt
-      	it fetch origin
-	      git fetch origin --tags
-	
+ 
     - name: Select and switch to the specified version tag
       run: |
         cd x-wrt
