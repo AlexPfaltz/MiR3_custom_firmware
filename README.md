@@ -20,6 +20,9 @@ A template for building OpenWrt with GitHub Actions
 
 ## Tips
 
+- WiFi is turned off by default
+- X-Wrt http://192.168.15.1/ admin/admin(login/password)  ssh - root/admin(login/password)
+- OpenWrt http://192.168.1.1/
 - It may take a long time to create a `.config` file and build the OpenWrt firmware. Thus, before create repository to build your own firmware, you may check out if others have already built it which meet your needs by simply [search `Actions-Openwrt` in GitHub](https://github.com/search?q=Actions-openwrt).
 - Add some meta info of your built firmware (such as firmware architecture and installed packages) to your repository introduction, this will save others' time.
 
