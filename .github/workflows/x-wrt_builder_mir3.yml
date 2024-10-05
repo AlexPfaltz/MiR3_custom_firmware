@@ -6,8 +6,7 @@ on:
 
 env:
   REPO_URL: https://github.com/x-wrt/x-wrt
-  REPO_BRANCH: main
-  CONFIG_FILE: config
+  CONFIG_FILE: config_x-wrt
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -85,40 +84,11 @@ jobs:
         make -j${COMPILE_THREADS} || make -j1 || make -j1 V=s
         echo "::set-output name=status::success"
 
-    - name: Prepare release
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      run: |
-        touch release.txt
-        echo "Branch: $REPO_BRANCH" >> release.txt
-        echo "Date: $(date +"%Y-%m-%d_%H:%M")" >> release.txt
-        echo "Arch: $ARCH_NAME" >> release.txt
-        echo "CPU: $CPU_NAME" >> release.txt
-        echo "Deivce: $DEVICE_NAME" >> release.txt
-        cd x-wrt/bin/targets/$ARCH_NAME/$CPU_NAME
-        rm -rf packages
-        echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
-
     - name: Upload release
       uses: softprops/action-gh-release@v1
       if: env.UPLOAD_RELEASE == 'true' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.REPO_BRANCH }}
-        body_path: release.txt
+        tag_name: "X-WRT - $(git describe --tags $(git rev-list --tags --max-count=1))"
         files: ${{ env.FIRMWARE_PATH }}/*
-
-    - name: Delete workflow runs
-      uses: GitRML/delete-workflow-runs@main
-      with:
-        retain_days: 7
-        keep_minimum_runs: 2
-
-    - name: Remove old releases
-      uses: dev-drprasad/delete-older-releases@v0.1.0
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      with:
-        keep_latest: 2
-        delete_tags: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
