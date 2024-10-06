@@ -10,7 +10,7 @@
 # See /LICENSE for more information.
 #
 
-name: OpenWrt Builder MIR3
+name: OpenWrt Snapshot Builder
 
 on:
   repository_dispatch:
