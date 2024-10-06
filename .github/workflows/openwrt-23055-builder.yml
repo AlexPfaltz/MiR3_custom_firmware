@@ -71,7 +71,7 @@ jobs:
 
     - name: Apply patch
       run: |
-        [ -d $PATCH_FILE ] && mv $PATCH_FILE openwrt
+        [ -e $PATCH_FILE ] && mv $PATCH_FILE openwrt/$PATCH_FILE
         cd openwrt
         git apply --check $PATCH_FILE
         git apply $PATCH_FILE
