@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
 
 env:
-  REPO_URL: https://github.com/x-wrt/x-wrt
+  REPO_URL: https://github.com/Bang5385/x-wrt
   CONFIG_FILE: config_x-wrt
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
