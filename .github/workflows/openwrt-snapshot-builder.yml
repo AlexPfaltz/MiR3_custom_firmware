@@ -55,11 +55,6 @@ jobs:
         git clone $REPO_URL
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
 
-    - name: Select and switch to the latest version tag
-      run: |
-        cd openwrt
-        git checkout -f $(git describe --tags $(git rev-list --tags --max-count=1))
-
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
