@@ -57,7 +57,7 @@ jobs:
     - name: Select and switch to the latest version tag
       run: |
         cd openwrt
-        git checkout -f $(git describe --tags $(git rev-list --tags --max-count=1))
+        git checkout v23.05.5
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
