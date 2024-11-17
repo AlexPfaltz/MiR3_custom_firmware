@@ -55,17 +55,17 @@ jobs:
         git clone $REPO_URL
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
         
+    - name: Select and switch to the latest version tag
+      run: |
+        cd openwrt
+        git checkout v23.05.5
+        
     - name: Load custom feeds
       run: |
         chmod +x $DIY_P1_SH
         cd openwrt
         $GITHUB_WORKSPACE/$DIY_P1_SH
         
-    - name: Select and switch to the latest version tag
-      run: |
-        cd openwrt
-        git checkout v23.05.5
-
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
