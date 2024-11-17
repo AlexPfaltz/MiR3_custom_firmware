@@ -20,6 +20,7 @@ env:
   REPO_URL: https://github.com/openwrt/openwrt
   CONFIG_FILE: config-openwrt_23055
   PATCH_FILE: openwrt-23055-mir3.patch
+  DIY_P1_SH: diy-part1.sh
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
@@ -58,6 +59,12 @@ jobs:
       run: |
         cd openwrt
         git checkout v23.05.5
+        
+    - name: Load custom feeds
+      run: |
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
 
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
