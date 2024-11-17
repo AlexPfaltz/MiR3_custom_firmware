@@ -1,5 +1,18 @@
+diff --git a/include/kernel-defaults.mk b/include/kernel-defaults.mk
+index b17ff7f932a..39e7ce12d3e 100644
+--- a/include/kernel-defaults.mk
++++ b/include/kernel-defaults.mk
+@@ -118,7 +118,7 @@ define Kernel/Configure/Default
+ 		cp $(LINUX_DIR)/.config.set $(LINUX_DIR)/.config.prev; \
+ 	}
+ 	$(_SINGLE) [ -d $(LINUX_DIR)/user_headers ] || $(KERNEL_MAKE) $(if $(findstring uml,$(BOARD)),ARCH=$(ARCH)) INSTALL_HDR_PATH=$(LINUX_DIR)/user_headers headers_install
+-	grep '=[ym]' $(LINUX_DIR)/.config.set | LC_ALL=C sort | $(MKHASH) md5 > $(LINUX_DIR)/.vermagic
++	grep '=[ym]' $(LINUX_DIR)/.config.set | LC_ALL=C sort | echo 5bc03255e08a37a54dbb31ad01735f42 > $(LINUX_DIR)/.vermagic
+ endef
+ 
+ define Kernel/Configure/Initramfs
 diff --git a/package/boot/uboot-envtools/files/ramips b/package/boot/uboot-envtools/files/ramips
-index eccdd4255a..b8bd083fa7 100644
+index eccdd4255ab..b8bd083fa71 100644
 --- a/package/boot/uboot-envtools/files/ramips
 +++ b/package/boot/uboot-envtools/files/ramips
 @@ -118,6 +118,7 @@ xiaomi,miwifi-3c)
@@ -12,7 +25,7 @@ index eccdd4255a..b8bd083fa7 100644
  xiaomi,mi-router-4|\
 diff --git a/target/linux/ramips/dts/mt7620a_xiaomi_miwifi-r3.dts b/target/linux/ramips/dts/mt7620a_xiaomi_miwifi-r3.dts
 new file mode 100644
-index 0000000000..36eb4de06f
+index 00000000000..36eb4de06fc
 --- /dev/null
 +++ b/target/linux/ramips/dts/mt7620a_xiaomi_miwifi-r3.dts
 @@ -0,0 +1,187 @@
@@ -206,7 +219,7 @@ index 0000000000..36eb4de06f
 \ No newline at end of file
 diff --git a/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.c b/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.c
 new file mode 100644
-index 0000000000..a04b511a52
+index 00000000000..a04b511a528
 --- /dev/null
 +++ b/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.c
 @@ -0,0 +1,2100 @@
@@ -2312,7 +2325,7 @@ index 0000000000..a04b511a52
 +MODULE_LICENSE("GPL");
 diff --git a/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.h b/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.h
 new file mode 100644
-index 0000000000..b94dc09479
+index 00000000000..b94dc09479a
 --- /dev/null
 +++ b/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.h
 @@ -0,0 +1,240 @@
@@ -2557,7 +2570,7 @@ index 0000000000..b94dc09479
 +
 +#endif
 diff --git a/target/linux/ramips/image/mt7620.mk b/target/linux/ramips/image/mt7620.mk
-index 61b79c962d..7c0aac6946 100644
+index 61b79c962d8..7c0aac69460 100644
 --- a/target/linux/ramips/image/mt7620.mk
 +++ b/target/linux/ramips/image/mt7620.mk
 @@ -1347,6 +1347,23 @@ define Device/xiaomi_miwifi-mini
@@ -2585,7 +2598,7 @@ index 61b79c962d..7c0aac6946 100644
    SOC := mt7620a
    IMAGE_SIZE := 16064k
 diff --git a/target/linux/ramips/mt7620/base-files/etc/board.d/02_network b/target/linux/ramips/mt7620/base-files/etc/board.d/02_network
-index cbfb8a1d86..20d480d1b5 100644
+index cbfb8a1d863..20d480d1b5a 100644
 --- a/target/linux/ramips/mt7620/base-files/etc/board.d/02_network
 +++ b/target/linux/ramips/mt7620/base-files/etc/board.d/02_network
 @@ -257,6 +257,10 @@ ramips_setup_interfaces()
@@ -2611,7 +2624,7 @@ index cbfb8a1d86..20d480d1b5 100644
  		label_mac=$(mtd_get_mac_binary factory 0x4)
  		;;
 diff --git a/target/linux/ramips/mt7620/base-files/lib/upgrade/platform.sh b/target/linux/ramips/mt7620/base-files/lib/upgrade/platform.sh
-index 6dd7fc7cef..17750b661b 100755
+index 6dd7fc7cef1..17750b661b9 100755
 --- a/target/linux/ramips/mt7620/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ramips/mt7620/base-files/lib/upgrade/platform.sh
 @@ -38,6 +38,14 @@ platform_do_upgrade() {
@@ -2630,7 +2643,7 @@ index 6dd7fc7cef..17750b661b 100755
  		default_do_upgrade "$1"
  		;;
 diff --git a/target/linux/ramips/mt7620/config-5.15 b/target/linux/ramips/mt7620/config-5.15
-index fdca30fecb..9540804625 100644
+index fdca30fecbf..95408046250 100644
 --- a/target/linux/ramips/mt7620/config-5.15
 +++ b/target/linux/ramips/mt7620/config-5.15
 @@ -32,8 +32,12 @@ CONFIG_CPU_R4K_CACHE_TLB=y
@@ -2694,7 +2707,7 @@ index fdca30fecb..9540804625 100644
 +CONFIG_ZLIB_DEFLATE=y
 +CONFIG_ZLIB_INFLATE=y
 diff --git a/target/linux/ramips/mt7620/target.mk b/target/linux/ramips/mt7620/target.mk
-index 34488f95af..1d1d281a0f 100644
+index 34488f95afb..1d1d281a0f1 100644
 --- a/target/linux/ramips/mt7620/target.mk
 +++ b/target/linux/ramips/mt7620/target.mk
 @@ -4,7 +4,7 @@
@@ -2708,7 +2721,7 @@ index 34488f95af..1d1d281a0f 100644
  DEFAULT_PACKAGES += kmod-rt2800-soc wpad-basic-mbedtls swconfig
 diff --git a/target/linux/ramips/patches-5.15/0038-mtd-ralink-add-mt7620-nand-driver.patch b/target/linux/ramips/patches-5.15/0038-mtd-ralink-add-mt7620-nand-driver.patch
 new file mode 100644
-index 0000000000..53851af318
+index 00000000000..53851af318f
 --- /dev/null
 +++ b/target/linux/ramips/patches-5.15/0038-mtd-ralink-add-mt7620-nand-driver.patch
 @@ -0,0 +1,18 @@
