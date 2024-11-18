@@ -62,7 +62,7 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-    
+
     - name: Read config target
       run: |
         cd keenetic-sdk
@@ -89,20 +89,23 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
-    - name: Upload bin directory
-      uses: actions/upload-artifact@main
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-      with:
-        name: Keenetic_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: keenetic-sdk/bin
+    - name: Debug firmware output
+      run: |
+        cd keenetic-sdk/bin
+        ls -R
 
     - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
-        cd keenetic-sdk/bin/targets/*/*
+        FIRMWARE_PATH=$(find keenetic-sdk/bin/targets -type d -name '*')
+        if [ -z "$FIRMWARE_PATH" ]; then
+          echo "Firmware directory not found."
+          exit 1
+        fi
+        cd $FIRMWARE_PATH
         rm -rf packages
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+        echo "FIRMWARE=$FIRMWARE_PATH" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
     - name: Upload firmware directory
@@ -110,7 +113,7 @@ jobs:
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
         name: Keenetic_firmware${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: ${{ env.FIRMWARE }}
+        path: ${{ env.FIRMWARE }}/*
 
     - name: Generate release tag
       id: tag
