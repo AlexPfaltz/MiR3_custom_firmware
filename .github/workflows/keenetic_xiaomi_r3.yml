@@ -38,12 +38,26 @@ jobs:
         df -hT $PWD
         git clone $REPO_URL keenetic-sdk
         ln -sf /workdir/keenetic-sdk $GITHUB_WORKSPACE/keenetic-sdk
- 
+
     - name: Select and switch to the specified version tag
       run: |
         cd keenetic-sdk
         git checkout -f $(git describe --tags $(git rev-list --tags --max-count=1))
-      
+
+    - name: Create feeds.conf.default
+      run: |
+        cd keenetic-sdk
+        cat <<EOF > feeds.conf.default
+        src-git packages https://git.openwrt.org/feed/packages.git
+        src-git luci https://git.openwrt.org/project/luci.git
+        src-git routing https://git.openwrt.org/feed/routing.git
+        src-git telephony https://git.openwrt.org/feed/telephony.git
+        #src-git video https://github.com/openwrt/video.git
+        #src-git targets https://github.com/openwrt/targets.git
+        #src-git oldpackages http://git.openwrt.org/packages.git
+        #src-link custom /usr/src/openwrt/custom-feed
+        EOF
+
     - name: Setup feeds
       run: |
         cd keenetic-sdk
@@ -62,7 +76,7 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-    
+
     - name: Read config target
       run: |
         cd keenetic-sdk
