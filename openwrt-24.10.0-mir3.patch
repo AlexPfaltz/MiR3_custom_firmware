@@ -1,20 +1,33 @@
+diff --git a/include/kernel-defaults.mk b/include/kernel-defaults.mk
+index cbe415abe6..045500f4dc 100644
+--- a/include/kernel-defaults.mk
++++ b/include/kernel-defaults.mk
+@@ -127,7 +127,7 @@ define Kernel/Configure/Default
+ 		cp $(LINUX_DIR)/.config.set $(LINUX_DIR)/.config.prev; \
+ 	}
+ 	$(_SINGLE) [ -d $(LINUX_DIR)/user_headers ] || $(KERNEL_MAKE) $(if $(findstring uml,$(BOARD)),ARCH=$(ARCH)) INSTALL_HDR_PATH=$(LINUX_DIR)/user_headers headers_install
+-	grep '=[ym]' $(LINUX_DIR)/.config.set | LC_ALL=C sort | $(MKHASH) md5 > $(LINUX_DIR)/.vermagic
++	grep '=[ym]' $(LINUX_DIR)/.config.set | LC_ALL=C sort | echo 'c9cccc93bbbebb11be8c7da55273767b' > $(LINUX_DIR)/.vermagic
+ endef
+ 
+ define Kernel/Configure/Initramfs
 diff --git a/package/boot/uboot-envtools/files/ramips b/package/boot/uboot-envtools/files/ramips
-index 341687625c8..f5c7539f1a8 100644
+index 341687625c..bc97c44196 100644
 --- a/package/boot/uboot-envtools/files/ramips
 +++ b/package/boot/uboot-envtools/files/ramips
 @@ -124,6 +124,7 @@ xiaomi,miwifi-3c)
  	ubootenv_add_uci_config "/dev/mtd1" "0x0" "0x1000" "0x10000"
  	ubootenv_add_uci_sys_config "/dev/mtd2" "0x0" "0x4000" "0x10000"
  	;;
-+xiaomi,miwifi-r3|\
++xiaomi,mi-router-3|\
  xiaomi,mi-router-3g|\
  xiaomi,mi-router-3-pro|\
  xiaomi,mi-router-4|\
-diff --git a/target/linux/ramips/dts/mt7620a_xiaomi_miwifi-r3.dts b/target/linux/ramips/dts/mt7620a_xiaomi_miwifi-r3.dts
+diff --git a/target/linux/ramips/dts/mt7620a_xiaomi_mi-router-3.dts b/target/linux/ramips/dts/mt7620a_xiaomi_mi-router-3.dts
 new file mode 100644
-index 00000000000..a43f2437276
+index 0000000000..2246e7b994
 --- /dev/null
-+++ b/target/linux/ramips/dts/mt7620a_xiaomi_miwifi-r3.dts
++++ b/target/linux/ramips/dts/mt7620a_xiaomi_mi-router-3.dts
 @@ -0,0 +1,194 @@
 +/dts-v1/;
 +
@@ -24,8 +37,8 @@ index 00000000000..a43f2437276
 +#include <dt-bindings/input/input.h>
 +
 +/ {
-+	compatible = "xiaomi,miwifi-r3", "ralink,mt7620a-soc";
-+	model = "Xiaomi Mi Router R3";
++	compatible = "xiaomi,mi-router-3", "ralink,mt7620a-soc";
++	model = "Xiaomi Mi Router 3";
 +
 +	aliases {
 +		led-status = &led_status_blue;
@@ -212,7 +225,7 @@ index 00000000000..a43f2437276
 +};
 diff --git a/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.c b/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.c
 new file mode 100644
-index 00000000000..a04b511a528
+index 0000000000..a04b511a52
 --- /dev/null
 +++ b/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.c
 @@ -0,0 +1,2100 @@
@@ -2318,7 +2331,7 @@ index 00000000000..a04b511a528
 +MODULE_LICENSE("GPL");
 diff --git a/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.h b/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.h
 new file mode 100644
-index 00000000000..b94dc09479a
+index 0000000000..b94dc09479
 --- /dev/null
 +++ b/target/linux/ramips/files/drivers/mtd/maps/ralink_nand.h
 @@ -0,0 +1,240 @@
@@ -2563,14 +2576,14 @@ index 00000000000..b94dc09479a
 +
 +#endif
 diff --git a/target/linux/ramips/image/mt7620.mk b/target/linux/ramips/image/mt7620.mk
-index 6cf65ad1194..b09195ca8ce 100644
+index 6cf65ad119..9033336887 100644
 --- a/target/linux/ramips/image/mt7620.mk
 +++ b/target/linux/ramips/image/mt7620.mk
 @@ -1411,6 +1411,27 @@ define Device/xiaomi_miwifi-mini
  endef
  TARGET_DEVICES += xiaomi_miwifi-mini
  
-+define Device/xiaomi_miwifi-r3
++define Device/xiaomi_mi-router-3
 +  SOC := mt7620a
 +  BLOCKSIZE := 128k
 +  PAGESIZE := 2048
@@ -2586,34 +2599,34 @@ index 6cf65ad1194..b09195ca8ce 100644
 +			     append-kernel | pad-to $$(KERNEL_SIZE) | \
 +			     append-ubi | check-size
 +  DEVICE_VENDOR := Xiaomi
-+  DEVICE_MODEL := Mi Router R3
++  DEVICE_MODEL := Mi Router 3
 +  DEVICE_PACKAGES := kmod-mt76x2 kmod-usb2 kmod-usb-ohci uboot-envtools
 +endef
-+TARGET_DEVICES += xiaomi_miwifi-r3
++TARGET_DEVICES += xiaomi_mi-router-3
 +
  define Device/youku_x2
    SOC := mt7620a
    IMAGE_SIZE := 16064k
 diff --git a/target/linux/ramips/mt7620/base-files/etc/board.d/02_network b/target/linux/ramips/mt7620/base-files/etc/board.d/02_network
-index 577f77cb933..9ddfd212329 100644
+index 577f77cb93..9bc9b13b97 100644
 --- a/target/linux/ramips/mt7620/base-files/etc/board.d/02_network
 +++ b/target/linux/ramips/mt7620/base-files/etc/board.d/02_network
-@@ -278,6 +278,10 @@ ramips_setup_interfaces()
+@@ -202,6 +202,10 @@ ramips_setup_interfaces()
  		ucidef_add_switch "switch0" \
- 			"0:lan" "1:lan" "4:wan" "6@eth0"
+ 			"0:lan:2" "1:lan:1" "4:wan" "6@eth0"
  		;;
-+	xiaomi,miwifi-r3)
++	xiaomi,mi-router-3)
 +		ucidef_add_switch "switch0" \
 +			"1:lan" "4:lan" "0:wan" "6@eth0"
 +		;;
- 	zbtlink,zbt-we1026-5g-16m)
+ 	lenovo,newifi-y1s)
  		ucidef_add_switch "switch0" \
- 			"0:lan" "6t@eth0"
+ 			"1:lan:4" "2:lan:3" "4:lan:2" "5:lan:1" "0:wan" "6@eth0"
 @@ -443,6 +447,10 @@ ramips_setup_macs()
  		wan_mac=$(mtd_get_mac_binary factory 0x2e)
  		label_mac=$(mtd_get_mac_binary factory 0x8004)
  		;;
-+	xiaomi,miwifi-r3)
++	xiaomi,mi-router-3)
 +		wan_mac=$(mtd_get_mac_binary factory 0x28)
 +		lan_mac=$(macaddr_setbit_la "$wan_mac")
 +		;;
@@ -2621,14 +2634,14 @@ index 577f77cb933..9ddfd212329 100644
  		lan_mac=$(mtd_get_mac_binary RF-EEPROM 0x4)
  		wan_mac=$(mtd_get_mac_binary RF-EEPROM 0x28)
 diff --git a/target/linux/ramips/mt7620/base-files/lib/upgrade/platform.sh b/target/linux/ramips/mt7620/base-files/lib/upgrade/platform.sh
-index 6dd7fc7cef1..17750b661b9 100755
+index 6dd7fc7cef..b674d432ea 100755
 --- a/target/linux/ramips/mt7620/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ramips/mt7620/base-files/lib/upgrade/platform.sh
-@@ -38,6 +38,14 @@ platform_do_upgrade() {
- 				of=/dev/mtdblock$idx
+@@ -41,5 +41,16 @@ platform_do_upgrade() {
+ 	*)
  		default_do_upgrade "$1"
  		;;
-+	xiaomi,miwifi-r3)
++	xiaomi,mi-router-3)
 +		# this make it compatible with breed
 +		dd if=/dev/mtd0 bs=64 count=1 2>/dev/null | grep -qi breed && CI_KERNPART_EXT="kernel_stock"
 +		dd if=/dev/mtd7 bs=64 count=1 2>/dev/null | grep -o MIPS.*Linux | grep -qi X-WRT && CI_KERNPART_EXT="kernel_stock"
@@ -2636,14 +2649,16 @@ index 6dd7fc7cef1..17750b661b9 100755
 +		dd if=/dev/mtd0 2>/dev/null | grep -qi pb-boot && CI_KERNPART_EXT="kernel_stock"
 +		nand_do_upgrade "$1"
 +		;;
- 	*)
- 		default_do_upgrade "$1"
- 		;;
++	*)
++		default_do_upgrade "$1"
++		;;
+ 	esac
+ }
 diff --git a/target/linux/ramips/mt7620/config-6.6 b/target/linux/ramips/mt7620/config-6.6
-index 2c95b9c960a..13e26eda15a 100644
+index 3e1ef761e0..e150ecf7cf 100644
 --- a/target/linux/ramips/mt7620/config-6.6
 +++ b/target/linux/ramips/mt7620/config-6.6
-@@ -36,11 +36,16 @@ CONFIG_CPU_R4K_CACHE_TLB=y
+@@ -33,11 +33,16 @@ CONFIG_CPU_R4K_CACHE_TLB=y
  CONFIG_CPU_SUPPORTS_32BIT_KERNEL=y
  CONFIG_CPU_SUPPORTS_HIGHMEM=y
  CONFIG_CPU_SUPPORTS_MSA=y
@@ -2660,7 +2675,7 @@ index 2c95b9c960a..13e26eda15a 100644
  CONFIG_CSRC_R4K=y
  CONFIG_DEBUG_INFO=y
  CONFIG_DEBUG_PINCTRL=y
-@@ -106,6 +111,8 @@ CONFIG_IRQ_WORK=y
+@@ -102,6 +107,8 @@ CONFIG_IRQ_WORK=y
  CONFIG_LIBFDT=y
  # CONFIG_LIST_HARDENED is not set
  CONFIG_LOCK_DEBUGGING_SUPPORT=y
@@ -2669,7 +2684,7 @@ index 2c95b9c960a..13e26eda15a 100644
  CONFIG_MARVELL_PHY=y
  CONFIG_MDIO_BUS=y
  CONFIG_MDIO_DEVICE=y
-@@ -128,6 +135,7 @@ CONFIG_MODULES_USE_ELF_REL=y
+@@ -124,6 +131,7 @@ CONFIG_MODULES_USE_ELF_REL=y
  # CONFIG_MT7621_WDT is not set
  # CONFIG_MTD_CFI_INTELEXT is not set
  CONFIG_MTD_CMDLINE_PARTS=y
@@ -2677,7 +2692,7 @@ index 2c95b9c960a..13e26eda15a 100644
  # CONFIG_MTD_PARSER_TPLINK_SAFELOADER is not set
  CONFIG_MTD_PHYSMAP=y
  CONFIG_MTD_SPI_NOR=y
-@@ -136,6 +144,10 @@ CONFIG_MTD_SPLIT_JIMAGE_FW=y
+@@ -132,6 +140,10 @@ CONFIG_MTD_SPLIT_JIMAGE_FW=y
  CONFIG_MTD_SPLIT_SEAMA_FW=y
  CONFIG_MTD_SPLIT_TPLINK_FW=y
  CONFIG_MTD_SPLIT_UIMAGE_FW=y
@@ -2688,7 +2703,7 @@ index 2c95b9c960a..13e26eda15a 100644
  CONFIG_MTD_VIRT_CONCAT=y
  CONFIG_NEED_DMA_MAP_STATE=y
  CONFIG_NEED_PER_CPU_KM=y
-@@ -181,11 +193,20 @@ CONFIG_PINCTRL_MT7620=y
+@@ -177,12 +189,21 @@ CONFIG_PINCTRL_MT7620=y
  CONFIG_PINCTRL_MTK_MTMIPS=y
  # CONFIG_PINCTRL_SINGLE is not set
  CONFIG_PREEMPT_NONE_BUILD=y
@@ -2700,6 +2715,7 @@ index 2c95b9c960a..13e26eda15a 100644
 +CONFIG_PSTORE_RAM=y
  CONFIG_PTP_1588_CLOCK_OPTIONAL=y
  CONFIG_RALINK=y
+ CONFIG_RALINK_TIMER=y
  CONFIG_RALINK_WDT=y
  CONFIG_RANDSTRUCT_NONE=y
  CONFIG_RATIONAL=y
@@ -2709,7 +2725,7 @@ index 2c95b9c960a..13e26eda15a 100644
  CONFIG_REGMAP=y
  CONFIG_REGMAP_MMIO=y
  CONFIG_REGULATOR=y
-@@ -195,6 +216,7 @@ CONFIG_SERIAL_8250_RT288X=y
+@@ -192,6 +213,7 @@ CONFIG_SERIAL_8250_RT288X=y
  CONFIG_SERIAL_MCTRL_GPIO=y
  CONFIG_SERIAL_OF_PLATFORM=y
  CONFIG_SOC_BUS=y
@@ -2717,7 +2733,7 @@ index 2c95b9c960a..13e26eda15a 100644
  CONFIG_SOC_MT7620=y
  # CONFIG_SOC_MT7621 is not set
  # CONFIG_SOC_RT288X is not set
-@@ -224,7 +246,11 @@ CONFIG_TICK_CPU_ACCOUNTING=y
+@@ -221,7 +243,11 @@ CONFIG_TICK_CPU_ACCOUNTING=y
  CONFIG_TIMER_OF=y
  CONFIG_TIMER_PROBE=y
  CONFIG_TINY_SRCU=y
@@ -2730,7 +2746,7 @@ index 2c95b9c960a..13e26eda15a 100644
 +CONFIG_ZLIB_DEFLATE=y
 +CONFIG_ZLIB_INFLATE=y
 diff --git a/target/linux/ramips/mt7620/target.mk b/target/linux/ramips/mt7620/target.mk
-index 34488f95afb..1d1d281a0f1 100644
+index 34488f95af..1d1d281a0f 100644
 --- a/target/linux/ramips/mt7620/target.mk
 +++ b/target/linux/ramips/mt7620/target.mk
 @@ -4,7 +4,7 @@
@@ -2744,7 +2760,7 @@ index 34488f95afb..1d1d281a0f1 100644
  DEFAULT_PACKAGES += kmod-rt2800-soc wpad-basic-mbedtls swconfig
 diff --git a/target/linux/ramips/patches-6.6/0038-mtd-ralink-add-mt7620-nand-driver.patch b/target/linux/ramips/patches-6.6/0038-mtd-ralink-add-mt7620-nand-driver.patch
 new file mode 100644
-index 00000000000..c932d2f5a9b
+index 0000000000..c932d2f5a9
 --- /dev/null
 +++ b/target/linux/ramips/patches-6.6/0038-mtd-ralink-add-mt7620-nand-driver.patch
 @@ -0,0 +1,18 @@
