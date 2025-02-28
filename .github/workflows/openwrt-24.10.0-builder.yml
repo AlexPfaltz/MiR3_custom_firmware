@@ -19,7 +19,6 @@ on:
 env:
   REPO_URL: https://github.com/openwrt/openwrt
   PATCH_FILE: openwrt-24.10.0-mir3.patch
-  UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
   UPLOAD_RELEASE: true
   TZ: Asia/Novosibirsk
@@ -56,6 +55,12 @@ jobs:
     - name: Select and switch to v24.10.0
       run: cd openwrt && git checkout v24.10.0
 
+    - name: Downloading feeds from the official openwrt release for mt7620
+      run: |
+       cd openwrt
+       rm -rf feeds.conf.default
+       wget https://downloads.openwrt.org/releases/24.10.0/targets/ramips/mt7620/feeds.buildinfo -O feeds.conf.default
+
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
 
@@ -65,7 +70,7 @@ jobs:
     - name: Load config
       run: cd openwrt && wget https://downloads.openwrt.org/releases/24.10.0/targets/ramips/mt7620/config.buildinfo -O .config
 
-    - name: Changing the configuration for MIR3
+    - name: Changing the config for MIR3
       run: |
         cd openwrt
         sed -i '/CONFIG_TARGET_MULTI_PROFILE/d' .config
@@ -78,7 +83,7 @@ jobs:
         CONFIG_LUCI_LANG_ru=y
         CONFIG_PACKAGE_luci-i18n-base-ru=y
         CONFIG_PACKAGE_luci-i18n-firewall-ru=y
-        CONFIG_PACKAGE_luci-i18n-package-manager-ru=y'>> .config
+        CONFIG_PACKAGE_luci-i18n-package-manager-ru=y' >> .config
 
     - name: Apply patch
       run: |
@@ -87,6 +92,7 @@ jobs:
         git apply --check $PATCH_FILE
         git apply $PATCH_FILE
         git status -s
+
 
     - name: Download package
       id: package
@@ -125,18 +131,12 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
-    - name: Upload bin directory
-      uses: actions/upload-artifact@main
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-      with:
-        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: openwrt/bin
-
     - name: Organize files
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
         cd openwrt/bin/targets/*/*
+        tar -czvf Packages.tar.gz packages
         echo "FIRMWARE=$PWD" >> $GITHUB_ENV
         echo "status=success" >> $GITHUB_OUTPUT
 
@@ -162,8 +162,9 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: OpenWRT-24.10.0
-        body_path: release.txt
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        name: 'OpenWRT 24.10.0'
+        body: 'Xiaomi Mi Router 3 Firmware. Base packages OpenWRT + luci-i18n-base-ru, ca-certificates. You can install mod packages from the official repository. Full compatibility is not guaranteed.'
         files: ${{ env.FIRMWARE }}/*
 
     - name: Delete workflow runs
