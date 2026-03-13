@@ -44,19 +44,23 @@ jobs:
           BASE_URL="https://downloads.openwrt.org/releases/$VERSION/targets/ramips/mt7620"
         fi
         
-        curl -s $BASE_URL/ | grep -o 'openwrt-sdk-ramips-mt7620[^"]*\.zst' > sdk_files.txt
-        SDK_FILE=$(head -1 sdk_files.txt)
+        echo "Checking: $BASE_URL/"
+        PAGE_CONTENT=$(curl -s $BASE_URL/)
+    
+        SDK_FILE=$(echo "$PAGE_CONTENT" | grep -oE 'openwrt-sdk-[^"]*ramips-mt7620[^"]*\.zst' | head -1)
         
         if [ -z "$SDK_FILE" ]; then
-          curl -s $BASE_URL/ | grep -o 'openwrt-sdk-ramips-mt7620[^"]*\.tar.xz' > sdk_files.txt
-          SDK_FILE=$(head -1 sdk_files.txt)
+          SDK_FILE=$(echo "$PAGE_CONTENT" | grep -oE 'openwrt-sdk-[^"]*ramips-mt7620[^"]*\.tar.xz' | head -1)
         fi
         
         if [ -z "$SDK_FILE" ]; then
-          echo "SDK file not found for version $VERSION"
+          echo "Error: SDK file not found for version $VERSION"
+          echo "Available files:"
+          echo "$PAGE_CONTENT" | grep -o 'href="[^"]*"' | grep -E 'sdk|imagebuilder' | head -20
           exit 1
         fi
-        
+    
+        echo "Found SDK file: $SDK_FILE"
         echo "Downloading: $BASE_URL/$SDK_FILE"
         wget -q --show-progress "$BASE_URL/$SDK_FILE"
         
